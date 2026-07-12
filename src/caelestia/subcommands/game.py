@@ -54,15 +54,20 @@ def get_games():
                 continue
                 
             categories = entry.get('Categories', '')
-            if 'game' not in categories.lower():
+            if not categories:
+                continue
+            
+            cat_list = [c.strip().lower() for c in categories.split(';')]
+            is_game = any('game' in c for c in cat_list)
+            
+            exclude_cats = {"utility", "network", "filetransfer", "emulator", "settings", "system"}
+            is_launcher = any(any(e in c for e in exclude_cats) for c in cat_list)
+            
+            if not is_game or is_launcher:
                 continue
                 
             name = entry.get('Name')
             if not name:
-                continue
-                
-            exclude = {"steam", "steam (runtime)", "steam (native)", "lutris", "heroic games launcher", "heroic", "bottles", "itch", "moonlight"}
-            if name.lower() in exclude:
                 continue
                 
             exec_cmd = entry.get('Exec')
