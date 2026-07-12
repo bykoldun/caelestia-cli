@@ -14,6 +14,7 @@ from caelestia.subcommands import (
     update,
     wallpaper,
     game,
+    launch,
 )
 from caelestia.utils.dots.manifest import Manifest
 from caelestia.utils.dots.packages import AUR_HELPERS
@@ -151,6 +152,12 @@ def parse_args() -> tuple[argparse.ArgumentParser, argparse.Namespace]:
     game_parser = command_parser.add_parser("game", help="launch a game by index")
     game_parser.set_defaults(cls=game.Command)
     game_parser.add_argument("number", help="the index of the game to launch")
+
+    # Create parser for launch opts
+    launch_parser = command_parser.add_parser("launch", help="launch an app from the app launcher by index")
+    launch_parser.set_defaults(cls=launch.Command)
+    launch_parser.add_argument("query", help="the search query or flag (e.g. '@g')")
+    launch_parser.add_argument("number", help="the index of the app to launch")
 
     # Create parser for install opts
     install_parser = command_parser.add_parser(

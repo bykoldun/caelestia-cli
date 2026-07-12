@@ -8,7 +8,7 @@ class Command:
 
     def run(self):
         if not getattr(self.args, 'number', None):
-            print("Usage: caelestia game <number>")
+            print("Usage: caelestia launch <query> <number>")
             sys.exit(1)
             
         try:
@@ -21,9 +21,9 @@ class Command:
             print("Index must be 1 or greater.")
             sys.exit(1)
             
-        # Call the new Quickshell IPC endpoint for the app launcher
+        # Call the Quickshell IPC endpoint
         try:
-            subprocess.run(["qs", "-c", "caelestia", "ipc", "call", "launcher", "launch", "@g", str(index)])
+            subprocess.run(["qs", "-c", "caelestia", "ipc", "call", "launcher", "launch", self.args.query, str(index)])
         except FileNotFoundError:
             print("Error: Quickshell (qs) is not installed or not in PATH.")
             sys.exit(1)
