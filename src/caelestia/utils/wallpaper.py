@@ -179,7 +179,14 @@ def set_wallpaper(wall: Path, no_smart: bool) -> None:
     # Launch mpvpaper if it's a video
     if is_video:
         log_file = open(os.path.expanduser("~/.local/state/caelestia/mpvpaper.log"), "w")
-        subprocess.Popen(["mpvpaper", "-o", "loop no-audio --panscan=1.0", "*", str(wall)], start_new_session=True, stderr=log_file, stdout=log_file)
+        
+        # Highly optimized mpv flags for wallpapers to prevent massive RAM/CPU consumption
+        mpv_opts = (
+            "loop-file=inf no-audio --panscan=1.0 "
+            "--hwdec=auto-safe --cache=no --demuxer-max-bytes=50M --vd-lavc-fast=yes"
+        )
+        
+        subprocess.Popen(["mpvpaper", "-p", "-o", mpv_opts, "*", str(wall)], start_new_session=True, stderr=log_file, stdout=log_file)
 
     # Use gif's or video's 1st frame for thumb only
     if wall.suffix.lower() == ".gif":
