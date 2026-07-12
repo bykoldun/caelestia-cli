@@ -156,8 +156,7 @@ def parse_args() -> tuple[argparse.ArgumentParser, argparse.Namespace]:
     # Create parser for launch opts
     launch_parser = command_parser.add_parser("launch", help="launch an app from the app launcher by index")
     launch_parser.set_defaults(cls=launch.Command)
-    launch_parser.add_argument("query", help="the search query or flag (e.g. '@g')")
-    launch_parser.add_argument("number", help="the index of the app to launch")
+    launch_parser.add_argument("args", nargs="+", help="the search query (optional) followed by the index (e.g. '1' or '@g 1')")
 
     # Create parser for install opts
     install_parser = command_parser.add_parser(
