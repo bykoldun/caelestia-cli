@@ -58,9 +58,16 @@ def get_games():
                 continue
                 
             name = entry.get('Name')
+            if not name:
+                continue
+                
+            exclude = {"steam", "steam (runtime)", "steam (native)", "lutris", "heroic games launcher", "heroic", "bottles", "itch", "moonlight"}
+            if name.lower() in exclude:
+                continue
+                
             exec_cmd = entry.get('Exec')
             
-            if name and exec_cmd:
+            if exec_cmd:
                 app_id = filepath.stem
                 games.append((name, exec_cmd, app_id))
                 
