@@ -13,6 +13,7 @@ from caelestia.subcommands import (
     toggle,
     update,
     wallpaper,
+    game,
 )
 from caelestia.utils.dots.manifest import Manifest
 from caelestia.utils.dots.packages import AUR_HELPERS
@@ -145,6 +146,11 @@ def parse_args() -> tuple[argparse.ArgumentParser, argparse.Namespace]:
     resizer_parser.add_argument("width", nargs="?", help="width to resize to")
     resizer_parser.add_argument("height", nargs="?", help="height to resize to")
     resizer_parser.add_argument("actions", nargs="?", help="comma-separated actions to apply (float,center,pip)")
+
+    # Create parser for game opts
+    game_parser = command_parser.add_parser("game", help="launch a game by index")
+    game_parser.set_defaults(cls=game.Command)
+    game_parser.add_argument("number", help="the index of the game to launch")
 
     # Create parser for install opts
     install_parser = command_parser.add_parser(
