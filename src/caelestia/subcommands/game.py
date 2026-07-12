@@ -4,6 +4,22 @@ import subprocess
 import shlex
 from pathlib import Path
 import configparser
+import sqlite3
+
+def get_frequencies():
+    freqs = {}
+    db_path = os.path.expanduser('~/.local/state/caelestia/apps.sqlite')
+    if os.path.exists(db_path):
+        try:
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            cursor.execute("SELECT id, frequency FROM frequencies")
+            for row in cursor.fetchall():
+                freqs[row[0]] = row[1]
+            conn.close()
+        except Exception:
+            pass
+    return freqs
 
 def get_xdg_data_dirs():
     dirs = os.environ.get('XDG_DATA_DIRS', '/usr/local/share/:/usr/share/')
@@ -45,13 +61,16 @@ def get_games():
             exec_cmd = entry.get('Exec')
             
             if name and exec_cmd:
-                games.append((name, exec_cmd))
+                app_id = filepath.stem
+                games.append((name, exec_cmd, app_id))
                 
         except Exception:
             pass
 
-    # Sort perfectly alphabetically to match the user's expected indexing
-    games.sort(key=lambda x: x[0].lower())
+    freqs = get_frequencies()
+    
+    # Sort perfectly by frequency (descending) then alphabetically
+    games.sort(key=lambda x: (-freqs.get(x[2], 0), x[0].lower()))
     return games
 
 class Command:
