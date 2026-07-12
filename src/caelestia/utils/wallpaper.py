@@ -26,10 +26,13 @@ from caelestia.utils.theme import apply_colours
 
 
 def is_valid_image(path: Path) -> bool:
-    return path.is_file() and path.suffix in [".jpg", ".jpeg", ".png", ".webp", ".tif", ".tiff", ".gif"]
+    return path.is_file() and path.suffix.lower() in [".jpg", ".jpeg", ".png", ".webp", ".tif", ".tiff", ".gif", ".mp4", ".webm", ".mkv", ".avi"]
 
 
 def check_wall(wall: Path, filter_size: tuple[int, int], threshold: float) -> bool:
+    # If it's a video, just assume it's fine for random
+    if wall.suffix.lower() in [".mp4", ".webm", ".mkv", ".avi"]:
+        return True
     with Image.open(wall) as img:
         width, height = img.size
         return width >= filter_size[0] * threshold and height >= filter_size[1] * threshold
@@ -105,6 +108,8 @@ def get_colours_for_wall(wall: Path | str, no_smart: bool) -> None:
 
     if wall.suffix.lower() == ".gif":
         wall = convert_gif(wall)
+    elif wall.suffix.lower() in [".mp4", ".webm", ".mkv", ".avi"]:
+        wall = convert_video(wall)
 
     name = "dynamic"
 
@@ -147,6 +152,17 @@ def convert_gif(wall: Path) -> Path:
     return output_path
 
 
+def convert_video(wall: Path) -> Path:
+    cache = wallpapers_cache_dir / compute_hash(wall)
+    output_path = cache / "first_frame.jpg"
+
+    if not output_path.exists():
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        subprocess.run(["ffmpeg", "-y", "-i", str(wall), "-vframes", "1", "-f", "image2", str(output_path)], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+
+    return output_path
+
+
 def set_wallpaper(wall: Path, no_smart: bool) -> None:
     # Make path absolute
     wall = Path(wall).resolve()
@@ -154,8 +170,24 @@ def set_wallpaper(wall: Path, no_smart: bool) -> None:
     if not is_valid_image(wall):
         raise ValueError(f'"{wall}" is not a valid image')
 
-    # Use gif's 1st frame for thumb only
-    wall_cache = convert_gif(wall) if wall.suffix.lower() == ".gif" else wall
+    # Kill any existing mpvpaper daemon
+    subprocess.run(["pkill", "-f", "mpvpaper"], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+    
+    # Check if it's a video
+    is_video = wall.suffix.lower() in [".mp4", ".webm", ".mkv", ".avi"]
+    
+    # Launch mpvpaper if it's a video
+    if is_video:
+        log_file = open(os.path.expanduser("~/.local/state/caelestia/mpvpaper.log"), "w")
+        subprocess.Popen(["mpvpaper", "-o", "loop no-audio --panscan=1.0", "*", str(wall)], start_new_session=True, stderr=log_file, stdout=log_file)
+
+    # Use gif's or video's 1st frame for thumb only
+    if wall.suffix.lower() == ".gif":
+        wall_cache = convert_gif(wall)
+    elif is_video:
+        wall_cache = convert_video(wall)
+    else:
+        wall_cache = wall
 
     # Update files
     wallpaper_path_path.parent.mkdir(parents=True, exist_ok=True)

@@ -110,6 +110,7 @@ def parse_args() -> tuple[argparse.ArgumentParser, argparse.Namespace]:
     wallpaper_parser.add_argument(
         "-r", "--random", nargs="?", const=wallpapers_dir, metavar="DIR", help="switch to a random wallpaper"
     )
+    wallpaper_parser.add_argument("--boot", action="store_true", help="boot mpvpaper if applicable")
     wallpaper_parser.add_argument("-f", "--file", help="the path to the wallpaper to switch to")
     wallpaper_parser.add_argument("-n", "--no-filter", action="store_true", help="do not filter by size")
     wallpaper_parser.add_argument(
