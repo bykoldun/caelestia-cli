@@ -183,7 +183,7 @@ def set_wallpaper(wall: Path, no_smart: bool) -> None:
         # Highly optimized mpv flags for wallpapers to prevent massive RAM/CPU consumption
         mpv_opts = (
             "loop-file=inf no-audio --panscan=1.0 "
-            "--hwdec=auto-safe --cache=no --demuxer-max-bytes=50M --vd-lavc-fast=yes"
+            "--hwdec=no --cache=no --demuxer-max-bytes=50M --vd-lavc-fast=yes"
         )
         
         subprocess.Popen(["mpvpaper", "-p", "-o", mpv_opts, "*", str(wall)], start_new_session=True, stderr=log_file, stdout=log_file)
