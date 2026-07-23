@@ -183,10 +183,10 @@ def set_wallpaper(wall: Path, no_smart: bool) -> None:
         # Highly optimized mpv flags for wallpapers to prevent massive RAM/CPU consumption
         mpv_opts = (
             "loop-file=inf no-audio --panscan=1.0 "
-            "--hwdec=no --cache=no --demuxer-max-bytes=50M --vd-lavc-fast=yes"
+            "--hwdec=no --vd-lavc-threads=1 --sws-allow-zimg=no --demuxer-max-bytes=10M --vd-lavc-fast=yes"
         )
         
-        subprocess.Popen(["mpvpaper", "-p", "-o", mpv_opts, "*", str(wall)], start_new_session=True, stderr=log_file, stdout=log_file)
+        subprocess.Popen(["mpvpaper", "-s", "-o", mpv_opts, "*", str(wall)], start_new_session=True, stderr=log_file, stdout=log_file)
 
     # Use gif's or video's 1st frame for thumb only
     if wall.suffix.lower() == ".gif":

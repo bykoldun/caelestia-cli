@@ -24,8 +24,8 @@ class Command:
                     import subprocess
                     subprocess.run(["pkill", "-f", "mpvpaper"], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
                     log_file = open(os.path.expanduser("~/.local/state/caelestia/mpvpaper.log"), "w")
-                    mpv_opts = "loop-file=inf no-audio --panscan=1.0 --hwdec=no --cache=no --demuxer-max-bytes=50M --vd-lavc-fast=yes"
-                    subprocess.Popen(["mpvpaper", "-p", "-o", mpv_opts, "*", str(wall_path)], start_new_session=True, stderr=log_file, stdout=log_file)
+                    mpv_opts = "loop-file=inf no-audio --panscan=1.0 --hwdec=no --vd-lavc-threads=1 --sws-allow-zimg=no --demuxer-max-bytes=10M --vd-lavc-fast=yes"
+                    subprocess.Popen(["mpvpaper", "-s", "-o", mpv_opts, "*", str(wall_path)], start_new_session=True, stderr=log_file, stdout=log_file)
         elif self.args.file:
             set_wallpaper(self.args.file, self.args.no_smart)
         elif self.args.random:
